@@ -3,7 +3,7 @@ package ru.spbau.bachelors2015.veselov.tokenization
 import org.scalatest.FunSuite
 import ru.spbau.bachelors2015.veselov.tokenization.tokens._
 
-class ExpressionTokenizerImplTest extends FunSuite {
+class ExpressionTokenizerTest extends FunSuite {
   test("tokenize single integer number") {
     testSingleNumber("1234")
   }
@@ -16,28 +16,14 @@ class ExpressionTokenizerImplTest extends FunSuite {
     testSingleNumber("12.34")
   }
 
-  test("nextToken on empty Tokenizer") {
-    val string = "1234"
-    val tokenizer = new ExpressionTokenizerImpl(string)
-    consumeAllTokens(tokenizer, List(new NumberToken(string)))
-
-    assertThrows[NoTokensLeftException] {
-      tokenizer.nextToken()
-    }
-  }
-
   test("invalid string") {
-    val tokenizer = new ExpressionTokenizerImpl("abacaba")
-
     assertThrows[InvalidTokenException] {
-      tokenizer.nextToken()
+      ExpressionTokenizer.tokenList("abacaba")
     }
   }
 
   test("complicated expression with all possible types of tokens") {
-    val tokenizer = new ExpressionTokenizerImpl("1+2-(3.3*4)/5.5")
-
-    consumeAllTokens(tokenizer,
+    testCharSequence("1+2-(3.3*4)/5.5",
       List(
         new NumberToken("1"),
         new AddOpToken,
@@ -52,16 +38,12 @@ class ExpressionTokenizerImplTest extends FunSuite {
         new NumberToken("5.5")))
   }
 
-  private def consumeAllTokens(tokenizer: ExpressionTokenizerImpl,
+  private def testCharSequence(chars: CharSequence,
                                expectedTokens: List[Token]): Unit = {
-    for (token <- expectedTokens) {
-      assert(token == tokenizer.nextToken())
-    }
-
-    assert(tokenizer.isEmpty())
+    assert(expectedTokens == ExpressionTokenizer.tokenList(chars))
   }
 
   private def testSingleNumber(string: String): Unit = {
-    consumeAllTokens(new ExpressionTokenizerImpl(string), List(new NumberToken(string)))
+    testCharSequence(string, List(new NumberToken(string)))
   }
 }
