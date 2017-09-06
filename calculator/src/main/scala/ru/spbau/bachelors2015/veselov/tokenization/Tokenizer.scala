@@ -1,5 +1,9 @@
 package ru.spbau.bachelors2015.veselov.tokenization
 
+import ru.spbau.bachelors2015.veselov.tokenization.tokens._
+
+// TODO: build pattern automatically
+
 /**
   * Tokenizer breaks a given string into a sequence of tokens.
   *
@@ -8,7 +12,13 @@ package ru.spbau.bachelors2015.veselov.tokenization
 class Tokenizer(string: String) {
   private var chars: CharSequence = string
 
-  private val pattern = raw"(?<number>(0|([1-9]\d*))(.\d+)?)".r
+  private val pattern = (raw"(?<number>(0|([1-9]\d*))(\.\d+)?)|" +
+                         raw"(?<addop>\+)|" +
+                         raw"(?<subop>-)|" +
+                         raw"(?<mulop>\*)|" +
+                         raw"(?<divop>/)|" +
+                         raw"(?<leftparen>\()|" +
+                         raw"(?<rightparen>\))").r
 
   /**
     * Checks weather the string is consumed.
@@ -34,7 +44,31 @@ class Tokenizer(string: String) {
     chars = chars.subSequence(matchResult.end, chars.length)
 
     if (option.get.group("number") != null) {
-      return new NumberToken(matched.toDouble)
+      return new NumberToken(matched)
+    }
+
+    if (option.get.group("addop") != null) {
+      return new AddOpToken
+    }
+
+    if (option.get.group("subop") != null) {
+      return new SubOpToken
+    }
+
+    if (option.get.group("mulop") != null) {
+      return new MulOpToken
+    }
+
+    if (option.get.group("divop") != null) {
+      return new DivOpToken
+    }
+
+    if (option.get.group("leftparen") != null) {
+      return new LeftParenToken
+    }
+
+    if (option.get.group("rightparen") != null) {
+      return new RightParenToken
     }
 
     throw new TokenizationError

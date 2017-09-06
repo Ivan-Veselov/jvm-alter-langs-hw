@@ -1,6 +1,7 @@
 package ru.spbau.bachelors2015.veselov.tokenization
 
 import org.scalatest.FunSuite
+import ru.spbau.bachelors2015.veselov.tokenization.tokens._
 
 class TokenizerTest extends FunSuite {
   test("tokenize single integer number") {
@@ -18,7 +19,7 @@ class TokenizerTest extends FunSuite {
   test("nextToken on empty Tokenizer") {
     val string = "1234"
     val tokenizer = new Tokenizer(string)
-    consumeTokens(tokenizer, List(new NumberToken(string.toDouble)))
+    consumeAllTokens(tokenizer, List(new NumberToken(string)))
 
     assertThrows[NoTokensLeftException] {
       tokenizer.nextToken()
@@ -33,7 +34,25 @@ class TokenizerTest extends FunSuite {
     }
   }
 
-  private def consumeTokens(tokenizer: Tokenizer, expectedTokens: List[Token]): Unit = {
+  test("complicated expression with all possible types of tokens") {
+    val tokenizer = new Tokenizer("1+2-(3.3*4)/5.5")
+
+    consumeAllTokens(tokenizer,
+      List(
+        new NumberToken("1"),
+        new AddOpToken,
+        new NumberToken("2"),
+        new SubOpToken,
+        new LeftParenToken,
+        new NumberToken("3.3"),
+        new MulOpToken,
+        new NumberToken("4"),
+        new RightParenToken,
+        new DivOpToken,
+        new NumberToken("5.5")))
+  }
+
+  private def consumeAllTokens(tokenizer: Tokenizer, expectedTokens: List[Token]): Unit = {
     for (token <- expectedTokens) {
       assert(token == tokenizer.nextToken())
     }
@@ -42,6 +61,6 @@ class TokenizerTest extends FunSuite {
   }
 
   private def testSingleNumber(string: String): Unit = {
-    consumeTokens(new Tokenizer(string), List(new NumberToken(string.toDouble)))
+    consumeAllTokens(new Tokenizer(string), List(new NumberToken(string)))
   }
 }
