@@ -5,11 +5,11 @@ import ru.spbau.bachelors2015.veselov.tokenization.tokens._
 // TODO: build pattern automatically
 
 /**
-  * Tokenizer breaks a given string into a sequence of tokens.
+  * ExpressionTokenizer breaks a given string into a sequence of arithmetical tokens.
   *
   * @param string a string which should be tokenized.
   */
-class Tokenizer(string: String) {
+class ExpressionTokenizerImpl(string: String) extends ExpressionTokenizer {
   private var chars: CharSequence = string
 
   private val pattern = (raw"(?<number>(0|([1-9]\d*))(\.\d+)?)|" +
@@ -23,12 +23,12 @@ class Tokenizer(string: String) {
   /**
     * Checks weather the string is consumed.
     */
-  def isEmpty(): Boolean = chars.length == 0
+  override def isEmpty(): Boolean = chars.length == 0
 
   /**
     * Returns next token in the sequence.
     */
-  def nextToken(): Token = {
+  override def nextToken(): Token = {
     if (isEmpty()) {
       throw new NoTokensLeftException
     }
