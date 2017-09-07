@@ -4,7 +4,6 @@ import org.scalatest.FunSuite
 
 class ExpressionEvaluatorTest extends FunSuite {
   test("test addition") {
-    // TODO: check double values correctly
-    assert(ExpressionEvaluator.eval("1+2+3+4+5") == 15)
+    assert(ExpressionEvaluator.eval("1 + 2 + 3 + 4 + 5") == 1d + 2d + 3d + 4d + 5d)
   }
 }

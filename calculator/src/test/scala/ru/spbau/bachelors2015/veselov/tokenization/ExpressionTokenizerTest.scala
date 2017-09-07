@@ -22,18 +22,26 @@ class ExpressionTokenizerTest extends FunSuite {
   }
 
   test("complicated expression with all possible types of tokens") {
-    testCharSequence("1+2-(3.3*4)/5.5",
+    testCharSequence("1   + 2 - (3.3 * 4) / 5.5",
       List(
         new Token(TokenType.Number, "1"),
+        new Token(TokenType.Whitespace, "   "),
         new Token(TokenType.AddOp, "+"),
+        new Token(TokenType.Whitespace, " "),
         new Token(TokenType.Number, "2"),
+        new Token(TokenType.Whitespace, " "),
         new Token(TokenType.SubOp, "-"),
+        new Token(TokenType.Whitespace, " "),
         new Token(TokenType.LeftParen, "("),
         new Token(TokenType.Number, "3.3"),
+        new Token(TokenType.Whitespace, " "),
         new Token(TokenType.MulOp, "*"),
+        new Token(TokenType.Whitespace, " "),
         new Token(TokenType.Number, "4"),
         new Token(TokenType.RightParen, ")"),
+        new Token(TokenType.Whitespace, " "),
         new Token(TokenType.DivOp, "/"),
+        new Token(TokenType.Whitespace, " "),
         new Token(TokenType.Number, "5.5")))
   }
 

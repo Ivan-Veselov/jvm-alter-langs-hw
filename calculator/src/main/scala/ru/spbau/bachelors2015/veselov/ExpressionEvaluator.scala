@@ -7,7 +7,9 @@ import ru.spbau.bachelors2015.veselov.tokenization.{ExpressionTokenizer, Token, 
 // TODO: add end token
 object ExpressionEvaluator {
   def eval(chars: CharSequence): Double = {
-    new InnerState(ExpressionTokenizer.tokenList(chars)).eval()
+    new InnerState(ExpressionTokenizer.tokenList(chars)
+                                      .filter(_.tokenType != TokenType.Whitespace)
+                  ).eval()
   }
 
   private class InnerState(val tokens: List[Token]) {
