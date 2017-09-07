@@ -1,5 +1,6 @@
 package ru.spbau.bachelors2015.veselov.evaluation
 
+import ru.spbau.bachelors2015.veselov.tokenization.TokenType.TokenType
 import ru.spbau.bachelors2015.veselov.tokenization.{ExpressionTokenizer, Token, TokenType}
 
 // TODO: add docs
@@ -14,12 +15,17 @@ object ExpressionEvaluator {
   private class InnerState(var tokens: List[Token]) {
     def eval(): Double = evalSum()
 
-    // TODO: add subtraction
     private def evalSum(): Double = {
+      val operations = Map[TokenType, (Double, Double) => Double](TokenType.AddOp -> (_ + _),
+                                                                  TokenType.SubOp -> (_ - _))
+
       var res = evalProd()
-      while (tokens.nonEmpty && tokens.head.tokenType == TokenType.AddOp) {
+
+      while (tokens.nonEmpty && operations.contains(tokens.head.tokenType)) {
+        val op = operations.apply(tokens.head.tokenType)
         tokens = tokens.drop(1)
-        res += evalProd()
+
+        res = op(res, evalProd())
       }
 
       return res
