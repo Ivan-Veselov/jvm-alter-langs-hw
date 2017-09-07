@@ -22,13 +22,25 @@ object ExpressionEvaluator {
 
     def eval(): Double = sumEvaluator.eval(new TokenViewer(tokens))
 
-    // TODO: add parentheses
     private object PrimaryEvaluator extends Evaluator {
       override def eval(viewer: TokenViewer): Double = {
+        // TODO: replace with case
         if (viewer.currentToken().tokenType == TokenType.Number) {
           val result = viewer.currentToken().chars.toDouble
           viewer.move()
 
+          return result
+        }
+
+        if (viewer.currentToken().tokenType == TokenType.LeftParen) {
+          viewer.move()
+          val result = sumEvaluator.eval(viewer)
+
+          if (viewer.currentToken().tokenType != TokenType.RightParen) {
+            throw new InvalidExpressionException
+          }
+
+          viewer.move()
           return result
         }
 
