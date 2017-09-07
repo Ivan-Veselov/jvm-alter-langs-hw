@@ -28,27 +28,27 @@ object ExpressionEvaluator {
           throw new InvalidExpressionException
         }
 
-        // TODO: replace with case
-        if (viewer.currentToken().tokenType == TokenType.Number) {
-          val result = viewer.currentToken().chars.toDouble
-          viewer.move()
+        var result = 0d
 
-          return result
+        viewer.currentToken().tokenType match {
+          case TokenType.Number =>
+            result = viewer.currentToken().chars.toDouble
+            viewer.move()
+
+          case TokenType.LeftParen =>
+            viewer.move()
+            result = sumEvaluator.eval(viewer)
+
+            if (!viewer.nonEmpty() || viewer.currentToken().tokenType != TokenType.RightParen) {
+              throw new InvalidExpressionException
+            }
+
+            viewer.move()
+
+          case _ => throw new InvalidExpressionException
         }
 
-        if (viewer.currentToken().tokenType == TokenType.LeftParen) {
-          viewer.move()
-          val result = sumEvaluator.eval(viewer)
-
-          if (!viewer.nonEmpty() || viewer.currentToken().tokenType != TokenType.RightParen) {
-            throw new InvalidExpressionException
-          }
-
-          viewer.move()
-          return result
-        }
-
-        throw new InvalidExpressionException
+        return result
       }
     }
   }
