@@ -12,16 +12,14 @@ object ExpressionEvaluator {
                   ).eval()
   }
 
-  private class InnerState(val tokens: List[Token]) {
-    private val currentToken = new TokenPointer()
-
+  private class InnerState(var tokens: List[Token]) {
     def eval(): Double = evalSum()
 
     // TODO: add subtraction
     private def evalSum(): Double = {
       var res = evalProd()
-      while (currentToken.token != null && currentToken.token.tokenType == TokenType.AddOp) {
-        currentToken.next()
+      while (tokens.nonEmpty && tokens.head.tokenType == TokenType.AddOp) {
+        tokens = tokens.drop(1)
         res += evalProd()
       }
 
@@ -35,32 +33,13 @@ object ExpressionEvaluator {
 
     // TODO: add parentheses
     private def evalPrimary(): Double = {
-      if (currentToken.token.tokenType == TokenType.Number) {
-        val result = currentToken.token.token.toDouble
-        currentToken.next()
+      if (tokens.head.tokenType == TokenType.Number) {
+        val result = tokens.head.chars.toDouble
+        tokens = tokens.drop(1)
         return result
       }
 
       throw new InvalidExpressionException
-    }
-
-    private class TokenPointer {
-      private val iterator = tokens.iterator
-
-      var token: Token =
-        if (!iterator.hasNext) {
-          throw new InvalidExpressionException
-        } else {
-          iterator.next()
-        }
-
-      def next(): Unit = {
-        if (iterator.isEmpty) {
-          token = null
-        } else {
-          token = iterator.next()
-        }
-      }
     }
   }
 }
