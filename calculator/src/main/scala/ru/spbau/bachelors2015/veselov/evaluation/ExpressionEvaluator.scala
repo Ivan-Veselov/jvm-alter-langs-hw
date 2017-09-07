@@ -12,7 +12,8 @@ object ExpressionEvaluator {
   }
 
   private class InnerState(tokens: List[Token]) {
-    private val prodEvaluator = new BinOpEvaluator(Map(TokenType.MulOp -> (_ * _)),
+    private val prodEvaluator = new BinOpEvaluator(Map(TokenType.MulOp -> (_ * _),
+                                                       TokenType.DivOp -> (_ / _)),
                                                    PrimaryEvaluator)
 
     private val sumEvaluator = new BinOpEvaluator(Map(TokenType.AddOp -> (_ + _),
