@@ -24,6 +24,10 @@ object ExpressionEvaluator {
 
     private object PrimaryEvaluator extends Evaluator {
       override def eval(viewer: TokenViewer): Double = {
+        if (!viewer.nonEmpty()) {
+          throw new InvalidExpressionException
+        }
+
         // TODO: replace with case
         if (viewer.currentToken().tokenType == TokenType.Number) {
           val result = viewer.currentToken().chars.toDouble
@@ -36,7 +40,7 @@ object ExpressionEvaluator {
           viewer.move()
           val result = sumEvaluator.eval(viewer)
 
-          if (viewer.currentToken().tokenType != TokenType.RightParen) {
+          if (!viewer.nonEmpty() || viewer.currentToken().tokenType != TokenType.RightParen) {
             throw new InvalidExpressionException
           }
 
