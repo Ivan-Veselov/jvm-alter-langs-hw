@@ -1,6 +1,5 @@
 package ru.spbau.bachelors2015.veselov.evaluation
 
-import ru.spbau.bachelors2015.veselov.tokenization.TokenType.TokenType
 import ru.spbau.bachelors2015.veselov.tokenization.{ExpressionTokenizer, Token, TokenType}
 
 // TODO: add docs
@@ -13,46 +12,27 @@ object ExpressionEvaluator {
   }
 
   private class InnerState(tokens: List[Token]) {
-    private val viewer = new TokenViewer(tokens)
+    private val prodEvaluator = new BinOpEvaluator(Map(TokenType.MulOp -> (_ * _)),
+                                                   PrimaryEvaluator)
 
-    def eval(): Double = evalSum()
+    private val sumEvaluator = new BinOpEvaluator(Map(TokenType.AddOp -> (_ + _),
+                                                      TokenType.SubOp -> (_ - _)),
+                                                  prodEvaluator)
 
-    private def evalSum(): Double = {
-      val operations = Map[TokenType, (Double, Double) => Double](TokenType.AddOp -> (_ + _),
-                                                                  TokenType.SubOp -> (_ - _))
-
-      var res = evalProd()
-
-      while (viewer.nonEmpty && operations.contains(viewer.currentToken().tokenType)) {
-        val op = operations.apply(viewer.currentToken().tokenType)
-        viewer.move()
-
-        res = op(res, evalProd())
-      }
-
-      return res
-    }
-
-    // TODO: add division
-    private def evalProd(): Double = {
-      var res = evalPrimary()
-      while (viewer.nonEmpty && viewer.currentToken().tokenType == TokenType.MulOp) {
-        viewer.move()
-        res *= evalPrimary()
-      }
-
-      return res
-    }
+    def eval(): Double = sumEvaluator.eval(new TokenViewer(tokens))
 
     // TODO: add parentheses
-    private def evalPrimary(): Double = {
-      if (viewer.currentToken().tokenType == TokenType.Number) {
-        val result = viewer.currentToken().chars.toDouble
-        viewer.move()
-        return result
-      }
+    private object PrimaryEvaluator extends Evaluator {
+      override def eval(viewer: TokenViewer): Double = {
+        if (viewer.currentToken().tokenType == TokenType.Number) {
+          val result = viewer.currentToken().chars.toDouble
+          viewer.move()
 
-      throw new InvalidExpressionException
+          return result
+        }
+
+        throw new InvalidExpressionException
+      }
     }
   }
 }
