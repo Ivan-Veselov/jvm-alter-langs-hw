@@ -7,6 +7,11 @@ object TokenType extends Enumeration {
   type TokenType = Value
   val Number, AddOp, SubOp, MulOp, DivOp, LeftParen, RightParen, Whitespace = Value
 
+  /**
+    * Returns regex for a given token type.
+    *
+    * @param tokenType a token type which regex is requested.
+    */
   def regex(tokenType: TokenType): String = tokenType match {
     case Number => raw"(0|([1-9]\d*))(\.\d+)?"
     case AddOp => raw"\+"
