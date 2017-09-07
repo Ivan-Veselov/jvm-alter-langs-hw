@@ -1,7 +1,6 @@
 package ru.spbau.bachelors2015.veselov
 
-import ru.spbau.bachelors2015.veselov.tokenization.ExpressionTokenizer
-import ru.spbau.bachelors2015.veselov.tokenization.tokens.{AddOpToken, NumberToken, Token}
+import ru.spbau.bachelors2015.veselov.tokenization.{ExpressionTokenizer, Token, TokenType}
 
 // TODO: add docs
 // TODO: add docs to exception
@@ -19,7 +18,7 @@ object ExpressionEvaluator {
     // TODO: add subtraction
     private def evalSum(): Double = {
       var res = evalProd()
-      while (currentToken.token != null && currentToken.token.isInstanceOf[AddOpToken]) {
+      while (currentToken.token != null && currentToken.token.tokenType == TokenType.AddOp) {
         currentToken.next()
         res += evalProd()
       }
@@ -34,8 +33,8 @@ object ExpressionEvaluator {
 
     // TODO: add parentheses
     private def evalPrimary(): Double = {
-      if (currentToken.token.isInstanceOf[NumberToken]) {
-        val result = currentToken.token.asInstanceOf[NumberToken].string.toDouble
+      if (currentToken.token.tokenType == TokenType.Number) {
+        val result = currentToken.token.token.toDouble
         currentToken.next()
         return result
       }

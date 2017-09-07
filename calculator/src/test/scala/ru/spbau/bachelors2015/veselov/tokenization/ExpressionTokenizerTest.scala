@@ -1,7 +1,6 @@
 package ru.spbau.bachelors2015.veselov.tokenization
 
 import org.scalatest.FunSuite
-import ru.spbau.bachelors2015.veselov.tokenization.tokens._
 
 class ExpressionTokenizerTest extends FunSuite {
   test("tokenize single integer number") {
@@ -25,17 +24,17 @@ class ExpressionTokenizerTest extends FunSuite {
   test("complicated expression with all possible types of tokens") {
     testCharSequence("1+2-(3.3*4)/5.5",
       List(
-        new NumberToken("1"),
-        new AddOpToken,
-        new NumberToken("2"),
-        new SubOpToken,
-        new LeftParenToken,
-        new NumberToken("3.3"),
-        new MulOpToken,
-        new NumberToken("4"),
-        new RightParenToken,
-        new DivOpToken,
-        new NumberToken("5.5")))
+        new Token(TokenType.Number, "1"),
+        new Token(TokenType.AddOp, "+"),
+        new Token(TokenType.Number, "2"),
+        new Token(TokenType.SubOp, "-"),
+        new Token(TokenType.LeftParen, "("),
+        new Token(TokenType.Number, "3.3"),
+        new Token(TokenType.MulOp, "*"),
+        new Token(TokenType.Number, "4"),
+        new Token(TokenType.RightParen, ")"),
+        new Token(TokenType.DivOp, "/"),
+        new Token(TokenType.Number, "5.5")))
   }
 
   private def testCharSequence(chars: CharSequence,
@@ -44,6 +43,6 @@ class ExpressionTokenizerTest extends FunSuite {
   }
 
   private def testSingleNumber(string: String): Unit = {
-    testCharSequence(string, List(new NumberToken(string)))
+    testCharSequence(string, List(new Token(TokenType.Number, string)))
   }
 }

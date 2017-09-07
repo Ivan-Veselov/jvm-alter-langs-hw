@@ -1,7 +1,5 @@
 package ru.spbau.bachelors2015.veselov.tokenization
 
-import ru.spbau.bachelors2015.veselov.tokenization.tokens._
-
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -25,15 +23,16 @@ object ExpressionTokenizer {
     return list.toList
   }
 
-  // TODO: build pattern automatically
   private class InnerState(var chars: CharSequence) {
-    private val pattern = (raw"(?<number>(0|([1-9]\d*))(\.\d+)?)|" +
-                           raw"(?<addop>\+)|" +
-                           raw"(?<subop>-)|" +
-                           raw"(?<mulop>\*)|" +
-                           raw"(?<divop>/)|" +
-                           raw"(?<leftparen>\()|" +
-                           raw"(?<rightparen>\))").r
+    private val pattern = TokenType.values.foldLeft(new StringBuilder)(
+      (result, elem) => {
+        if (result.nonEmpty) {
+          result += '|'
+        }
+
+        result ++= "(?<" + elem.toString + ">" + TokenType.regex(elem) + ")"
+      }
+    ).toString().r
 
     def hasLeft(): Boolean = chars.length() > 0
 
@@ -48,32 +47,10 @@ object ExpressionTokenizer {
 
       chars = chars.subSequence(matchResult.end, chars.length)
 
-      if (option.get.group("number") != null) {
-        return new NumberToken(matched)
-      }
-
-      if (option.get.group("addop") != null) {
-        return new AddOpToken
-      }
-
-      if (option.get.group("subop") != null) {
-        return new SubOpToken
-      }
-
-      if (option.get.group("mulop") != null) {
-        return new MulOpToken
-      }
-
-      if (option.get.group("divop") != null) {
-        return new DivOpToken
-      }
-
-      if (option.get.group("leftparen") != null) {
-        return new LeftParenToken
-      }
-
-      if (option.get.group("rightparen") != null) {
-        return new RightParenToken
+      for (tokenType <- TokenType.values) {
+        if (option.get.group(tokenType.toString) != null) {
+          return new Token(tokenType, matched)
+        }
       }
 
       throw new TokenizationError
