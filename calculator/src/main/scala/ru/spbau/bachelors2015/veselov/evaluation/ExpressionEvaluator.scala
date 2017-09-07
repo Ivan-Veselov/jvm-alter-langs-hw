@@ -2,9 +2,16 @@ package ru.spbau.bachelors2015.veselov.evaluation
 
 import ru.spbau.bachelors2015.veselov.tokenization.{ExpressionTokenizer, Token, TokenType}
 
-// TODO: add docs
-// TODO: add docs to exception
+/**
+  * Singleton which can evaluate a given string to Double value.
+  */
 object ExpressionEvaluator {
+  /**
+    * Evaluates a given string with arithmetical expression to its value.
+    *
+    * @param chars a string which represents arithmetical expression.
+    * @return evaluated result.
+    */
   def eval(chars: CharSequence): Double = {
     new InnerState(ExpressionTokenizer.tokenList(chars)
                                       .filter(_.tokenType != TokenType.Whitespace)
