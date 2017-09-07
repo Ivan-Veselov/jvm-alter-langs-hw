@@ -4,7 +4,6 @@ import ru.spbau.bachelors2015.veselov.tokenization.{ExpressionTokenizer, Token, 
 
 // TODO: add docs
 // TODO: add docs to exception
-// TODO: add end token
 object ExpressionEvaluator {
   def eval(chars: CharSequence): Double = {
     new InnerState(ExpressionTokenizer.tokenList(chars)
@@ -26,9 +25,15 @@ object ExpressionEvaluator {
       return res
     }
 
-    // TODO: implement
+    // TODO: add division
     private def evalProd(): Double = {
-      return evalPrimary()
+      var res = evalPrimary()
+      while (tokens.nonEmpty && tokens.head.tokenType == TokenType.MulOp) {
+        tokens = tokens.drop(1)
+        res *= evalPrimary()
+      }
+
+      return res
     }
 
     // TODO: add parentheses
