@@ -12,7 +12,9 @@ object ExpressionEvaluator {
                   ).eval()
   }
 
-  private class InnerState(var tokens: List[Token]) {
+  private class InnerState(tokens: List[Token]) {
+    private val viewer = new TokenViewer(tokens)
+
     def eval(): Double = evalSum()
 
     private def evalSum(): Double = {
@@ -21,9 +23,9 @@ object ExpressionEvaluator {
 
       var res = evalProd()
 
-      while (tokens.nonEmpty && operations.contains(tokens.head.tokenType)) {
-        val op = operations.apply(tokens.head.tokenType)
-        tokens = tokens.drop(1)
+      while (viewer.nonEmpty && operations.contains(viewer.currentToken().tokenType)) {
+        val op = operations.apply(viewer.currentToken().tokenType)
+        viewer.move()
 
         res = op(res, evalProd())
       }
@@ -34,8 +36,8 @@ object ExpressionEvaluator {
     // TODO: add division
     private def evalProd(): Double = {
       var res = evalPrimary()
-      while (tokens.nonEmpty && tokens.head.tokenType == TokenType.MulOp) {
-        tokens = tokens.drop(1)
+      while (viewer.nonEmpty && viewer.currentToken().tokenType == TokenType.MulOp) {
+        viewer.move()
         res *= evalPrimary()
       }
 
@@ -44,9 +46,9 @@ object ExpressionEvaluator {
 
     // TODO: add parentheses
     private def evalPrimary(): Double = {
-      if (tokens.head.tokenType == TokenType.Number) {
-        val result = tokens.head.chars.toDouble
-        tokens = tokens.drop(1)
+      if (viewer.currentToken().tokenType == TokenType.Number) {
+        val result = viewer.currentToken().chars.toDouble
+        viewer.move()
         return result
       }
 
