@@ -1,7 +1,7 @@
 package ru.spbau.bachelors2015.veselov.evaluation
 
 import org.scalatest.FunSuite
-import ru.spbau.bachelors2015.veselov.tokenization.{ExpressionTokenizer, InvalidTokenException}
+import ru.spbau.bachelors2015.veselov.tokenization.InvalidTokenException
 
 class ExpressionEvaluatorTest extends FunSuite {
   test("addition") {
