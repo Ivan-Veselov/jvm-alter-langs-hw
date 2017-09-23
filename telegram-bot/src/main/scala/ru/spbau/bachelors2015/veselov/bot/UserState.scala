@@ -4,4 +4,6 @@ sealed trait UserState
 
 case object DefaultState extends UserState
 
-case class AnsweringState(phrase: String) extends UserState
+case class AnsweringState(phrase: String, idOfRecipient: Long) extends UserState
+
+case object AwaitingState extends UserState
