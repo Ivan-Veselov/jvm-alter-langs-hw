@@ -12,6 +12,11 @@ import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 import scala.util.{Random, Success}
 
+/**
+  * This bot receives message from user and resends it to another random user. Answer to original
+  * message is persisted in the database and returned back to the original message sender. If answer
+  * to some phrase is in the database then it's immediately returned as an answer.
+  */
 class MediatorBot(val token: String) extends TelegramBot with Commands with Polling {
   private val database = ActorSystem().actorOf(Props(classOf[DatabaseActor]))
 
