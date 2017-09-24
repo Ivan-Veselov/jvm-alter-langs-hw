@@ -41,7 +41,7 @@ class MediatorBot(val token: String) extends TelegramBot with Commands with Poll
                     } else {
                       val userId = freeUsers.toVector(random.nextInt(freeUsers.size))
                       userState.update(userId,
-                                       AnsweringState(text, message.chat.id))
+                                       AnsweringState(text, message.messageId, message.chat.id))
 
                       request(SendMessage(userId, text))
 
@@ -53,9 +53,9 @@ class MediatorBot(val token: String) extends TelegramBot with Commands with Poll
                 reply("Ошибка базы данных!")
             }
 
-            case AnsweringState(phrase, recipient) =>
+            case AnsweringState(phrase, messageId, recipient) =>
               database ! DatabaseWrite(phrase, text)
-              request(SendMessage(recipient, text))
+              request(SendMessage(recipient, text, None, None, None, Some(messageId)))
               userState.update(recipient, DefaultState)
 
               userState.update(message.chat.id, DefaultState)
