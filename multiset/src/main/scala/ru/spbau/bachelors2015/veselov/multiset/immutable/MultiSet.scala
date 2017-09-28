@@ -16,7 +16,7 @@ sealed abstract class MultiSet[+T] {
   // def find[A >: T](elem: A): Option[A]
 
   def count[A >: T](elem: A): Int
-  
+
   def intersection[A >: T](multiHashSet: MultiSet[A]): MultiSet[A]
 
   def &[A >: T](multiHashSet: MultiSet[A]): MultiSet[A] = intersection(multiHashSet)
