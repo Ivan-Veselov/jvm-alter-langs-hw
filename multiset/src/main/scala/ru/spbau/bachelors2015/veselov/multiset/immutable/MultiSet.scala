@@ -11,7 +11,7 @@ sealed abstract class MultiSet[+T] {
 
   // apply
 
-  def add[A >: T](elem: A): MultiSet[A]
+  def add[A >: T](elem: A*): MultiSet[A]
 
   // def find[A >: T](elem: A): Option[A]
 
