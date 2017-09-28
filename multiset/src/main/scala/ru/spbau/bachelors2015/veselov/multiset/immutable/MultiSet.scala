@@ -13,7 +13,7 @@ sealed abstract class MultiSet[+T] {
 
   def add[A >: T](elems: A*): MultiSet[A]
 
-  // def find[A >: T](elem: A): Option[A]
+  def find[A >: T](elem: A): Option[A]
 
   def count[A >: T](elem: A): Int
 
@@ -36,6 +36,8 @@ private class MultiSetOnMap[+T](elems: T*) extends MultiSet[T] {
   override def size: Int = ???
 
   override def add[A >: T](elems: A*): MultiSet[A] = ???
+
+  override def find[A >: T](elem: A): Option[A] = ???
 
   override def count[A >: T](elem: A): Int = ???
 
@@ -64,6 +66,8 @@ object MultiSet {
     override def size: Int = 0
 
     override def add[A](elems: A*): MultiSet[A] = new MultiSetOnMap[A](elems: _*)
+
+    override def find[A](elem: A): Option[A] = None
 
     override def count[A](elem: A): Int = 0
 

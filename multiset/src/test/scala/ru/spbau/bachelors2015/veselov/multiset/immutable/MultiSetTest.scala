@@ -5,7 +5,6 @@ import ru.spbau.bachelors2015.veselov.multiset.immutable
 
 // TODO: for-comprehension
 // TODO: pattern-matching
-// TODO: high-order functions
 // TODO: elem searching (find)
 // TODO: apply
 class MultiSetTest extends FlatSpec with Matchers {
@@ -27,6 +26,8 @@ class MultiSetTest extends FlatSpec with Matchers {
 
   private val emptySet = immutable.MultiSet.empty
   emptySet.add(0) should not be theSameInstanceAs (emptySet)
+
+  immutable.MultiSet.empty.find(0) shouldBe None
 
   immutable.MultiSet.empty.count(0) shouldBe 0
 
@@ -76,6 +77,14 @@ class MultiSetTest extends FlatSpec with Matchers {
 
   private val oneElementSet = immutable.MultiSet(0)
   oneElementSet.add(1) should not be theSameInstanceAs (oneElementSet)
+
+  immutable.MultiSet(0).find(0) shouldBe Some(0)
+
+  immutable.MultiSet(0, 1).find(0) shouldBe Some(0)
+
+  immutable.MultiSet(0, 0).find(0) shouldBe Some(0)
+
+  immutable.MultiSet(0, 1).find(2) shouldBe None
 
   immutable.MultiSet(0).count(1) shouldBe 0
 
