@@ -118,6 +118,8 @@ class MultiSetTest extends FlatSpec with Matchers {
 
   immutable.MultiSet(0, 1).union(immutable.MultiSet(2, 3)) shouldBe immutable.MultiSet(0, 1, 2, 3)
 
+  immutable.MultiSet(0, 1) | immutable.MultiSet(0, 1, 1) shouldBe immutable.MultiSet(0, 1, 1)
+
   immutable.MultiSet(0, 1).intersection(immutable.MultiSet(0, 1)) shouldBe immutable.MultiSet(0, 1)
 
   immutable.MultiSet(0, 1).intersection(immutable.MultiSet(0, 2)) shouldBe immutable.MultiSet(0)
@@ -126,4 +128,6 @@ class MultiSetTest extends FlatSpec with Matchers {
                                                                           immutable.MultiSet(0, 1)
 
   immutable.MultiSet(0, 1).intersection(immutable.MultiSet(2, 3)) shouldBe immutable.MultiSet.empty
+
+  immutable.MultiSet(0, 1) & immutable.MultiSet(0, 1, 1) shouldBe immutable.MultiSet(0, 1)
 }
