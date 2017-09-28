@@ -3,7 +3,6 @@ package ru.spbau.bachelors2015.veselov.multiset.immutable
 import org.scalatest.{FlatSpec, Matchers}
 import ru.spbau.bachelors2015.veselov.multiset.immutable
 
-// TODO: intersection and union
 // TODO: for-comprehension
 // TODO: pattern-matching
 // TODO: high-order functions
@@ -108,4 +107,23 @@ class MultiSetTest extends FlatSpec with Matchers {
 
   immutable.MultiSet(0, 1, 0).flatMap((n: Int) => List(n, n)) shouldBe immutable.MultiSet(
                                                                                   0, 0, 0, 0, 1, 1)
+
+  // intersection and union
+
+  immutable.MultiSet(0, 1).union(immutable.MultiSet(0, 1)) shouldBe immutable.MultiSet(0, 1)
+
+  immutable.MultiSet(0, 1).union(immutable.MultiSet(0, 2)) shouldBe immutable.MultiSet(0, 1, 2)
+
+  immutable.MultiSet(0, 1).union(immutable.MultiSet(0, 1, 1)) shouldBe immutable.MultiSet(0, 1, 1)
+
+  immutable.MultiSet(0, 1).union(immutable.MultiSet(2, 3)) shouldBe immutable.MultiSet(0, 1, 2, 3)
+
+  immutable.MultiSet(0, 1).intersection(immutable.MultiSet(0, 1)) shouldBe immutable.MultiSet(0, 1)
+
+  immutable.MultiSet(0, 1).intersection(immutable.MultiSet(0, 2)) shouldBe immutable.MultiSet(0)
+
+  immutable.MultiSet(0, 1).intersection(immutable.MultiSet(0, 1, 1)) shouldBe
+                                                                          immutable.MultiSet(0, 1)
+
+  immutable.MultiSet(0, 1).intersection(immutable.MultiSet(2, 3)) shouldBe immutable.MultiSet.empty
 }
