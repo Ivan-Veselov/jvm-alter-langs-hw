@@ -9,13 +9,13 @@ sealed abstract class MultiSet[+T] {
 
   def nonEmpty: Boolean = size > 0
 
-  // apply
-
   def add[A >: T](elems: A*): MultiSet[A]
 
   def find[A >: T](elem: A): Option[A]
 
   def count[A >: T](elem: A): Int
+
+  def apply[A >: T](elem: A): Int = count(elem)
 
   def intersection[A >: T](other: MultiSet[A]): MultiSet[A]
 

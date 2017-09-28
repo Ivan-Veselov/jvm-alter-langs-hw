@@ -5,8 +5,6 @@ import ru.spbau.bachelors2015.veselov.multiset.immutable
 
 // TODO: for-comprehension
 // TODO: pattern-matching
-// TODO: elem searching (find)
-// TODO: apply
 class MultiSetTest extends FlatSpec with Matchers {
   // Empty multiset
 
@@ -30,6 +28,8 @@ class MultiSetTest extends FlatSpec with Matchers {
   immutable.MultiSet.empty.find(0) shouldBe None
 
   immutable.MultiSet.empty.count(0) shouldBe 0
+
+  immutable.MultiSet.empty(0) shouldBe 0
 
   immutable.MultiSet.empty[Any].filter(_ => true) shouldBe immutable.MultiSet.empty
 
@@ -97,6 +97,8 @@ class MultiSetTest extends FlatSpec with Matchers {
   immutable.MultiSet(0, 1, 1).count(0) shouldBe 1
 
   immutable.MultiSet(0, 1, 1).count(1) shouldBe 2
+
+  immutable.MultiSet(0, 1, 1)(1) shouldBe 2
 
   immutable.MultiSet(0, 1).filter(n => n > 0) shouldBe immutable.MultiSet(1)
 
