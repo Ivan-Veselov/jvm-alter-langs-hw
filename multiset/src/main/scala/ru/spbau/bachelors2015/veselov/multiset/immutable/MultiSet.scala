@@ -1,9 +1,10 @@
 package ru.spbau.bachelors2015.veselov.multiset.immutable
 
 import scala.collection.GenTraversableOnce
+import scala.collection.immutable
 
 sealed abstract class MultiSet[+T] {
-  def size: Int
+  val size: Int
 
   def isEmpty: Boolean = size == 0
 
@@ -33,7 +34,30 @@ sealed abstract class MultiSet[+T] {
 }
 
 private class MultiSetOnMap[+T](elems: T*) extends MultiSet[T] {
-  override def size: Int = ???
+  private val hashTable: immutable.HashMap[Int, List[(T, Int)]] = {
+    var fromHash: immutable.HashMap[Int, List[T]] = immutable.HashMap.empty
+
+    elems.foreach(e => fromHash = fromHash.updated(e.hashCode(),
+                                                   fromHash.getOrElse(e.hashCode(), Nil) :+ e))
+
+    fromHash.map {
+      case (hash, es) =>
+        var pairs: List[(T, Int)] = Nil
+        es.foreach(t => {
+          val index = pairs.indexWhere { case (mainVal, _) => mainVal.equals(t) }
+          if (index == -1) {
+            pairs = pairs :+ (t, 1)
+          } else {
+            val amount = pairs(index)._2
+            pairs = pairs.updated(index, (t, amount + 1))
+          }
+        })
+
+        (hash, pairs)
+    }
+  }
+
+  override val size: Int = elems.size
 
   override def add[A >: T](elems: A*): MultiSet[A] = ???
 
@@ -50,6 +74,28 @@ private class MultiSetOnMap[+T](elems: T*) extends MultiSet[T] {
   override def map[A >: T, B](mapper: (A) => B): MultiSet[B] = ???
 
   override def flatMap[A >: T, B](mapper: (A) => GenTraversableOnce[B]): MultiSet[B] = ???
+
+  private def isSubsetOf[A >: T](that: MultiSetOnMap[A]): Boolean = {
+    hashTable.flatMap { case (hash, ts) =>
+      val tts = that.hashTable.get(hash).orNull
+      if (tts == null) {
+        Seq(false)
+      } else {
+        ts.map {
+        case (t, amount) =>
+          val index = tts.indexWhere { case (tt, _) => t.equals(tt) }
+          if (index == -1) return false
+
+          return amount <= tts(index)._2
+        }
+      }
+    }.fold(false)((a: Boolean, b: Boolean) => a || b)
+  }
+
+  override def equals(other: Any): Boolean = other match {
+    case that: MultiSetOnMap[Any] => that.isSubsetOf(this) && this.isSubsetOf(that)
+    case _ => false
+  }
 }
 
 object MultiSet {
@@ -63,7 +109,7 @@ object MultiSet {
   def empty[T]: MultiSet[T] = EmptyMultiSet
 
   private object EmptyMultiSet extends MultiSet {
-    override def size: Int = 0
+    override val size: Int = 0
 
     override def add[A](elems: A*): MultiSet[A] = new MultiSetOnMap[A](elems: _*)
 
