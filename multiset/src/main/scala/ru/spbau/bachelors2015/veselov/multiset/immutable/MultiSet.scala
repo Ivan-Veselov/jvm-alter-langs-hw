@@ -74,13 +74,15 @@ private class MultiSetOnMap[+T](elems: T*) extends MultiSet[T] {
 
   override def union[A >: T](other: MultiSet[A]): MultiSet[A] = ???
 
-  override def filter[A >: T](predicate: (A) => Boolean): MultiSet[A] = ???
+  override def filter[A >: T](predicate: (A) => Boolean): MultiSet[A] =
+    MultiSet(asList().filter(predicate): _*)
 
   override def map[A >: T, B](mapper: (A) => B): MultiSet[B] = ???
 
   override def flatMap[A >: T, B](mapper: (A) => GenTraversableOnce[B]): MultiSet[B] = ???
 
-  private def asList(): List[T] = hashTable.values.flatMap(l => l.map { case (t, _) => t }).toList
+  private def asList(): List[T] =
+    hashTable.values.flatMap(l => l.flatMap { case (t, a) => List.fill(a)(t) }).toList
 
   private def isSubsetOf[A >: T](that: MultiSetOnMap[A]): Boolean = {
     hashTable.flatMap { case (hash, ts) =>

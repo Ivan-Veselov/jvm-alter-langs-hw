@@ -75,6 +75,12 @@ class MultiSetTest extends FlatSpec with Matchers {
 
   immutable.MultiSet(0).add(0, 0) shouldBe immutable.MultiSet(0, 0, 0)
 
+  immutable.MultiSet(0, 0).add(0) shouldBe immutable.MultiSet(0, 0, 0)
+
+  immutable.MultiSet(0, 0).add(1) shouldBe immutable.MultiSet(0, 0, 1)
+
+  immutable.MultiSet(0, 0).add(1, 1) shouldBe immutable.MultiSet(0, 0, 1, 1)
+
   private val oneElementSet = immutable.MultiSet(0)
   oneElementSet.add(1) should not be theSameInstanceAs (oneElementSet)
 
