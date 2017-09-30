@@ -33,7 +33,7 @@ sealed abstract class MultiSet[+T] {
   def flatMap[A >: T, B](mapper: A => GenTraversableOnce[B]): MultiSet[B]
 }
 
-private class MultiSetOnMap[+T](elems: T*) extends MultiSet[T] {
+private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
   private val hashTable: immutable.HashMap[Int, List[(T, Int)]] = {
     var fromHash: immutable.HashMap[Int, List[T]] = immutable.HashMap.empty
 
@@ -85,7 +85,7 @@ private class MultiSetOnMap[+T](elems: T*) extends MultiSet[T] {
   private def asList(): List[T] =
     hashTable.values.flatMap(l => l.flatMap { case (t, a) => List.fill(a)(t) }).toList
 
-  private def isSubsetOf[A >: T](that: MultiSetOnMap[A]): Boolean = {
+  private def isSubsetOf[A >: T](that: MultiSetImpl[A]): Boolean = {
     hashTable.flatMap { case (hash, ts) =>
       val tts = that.hashTable.get(hash).orNull
       if (tts == null) {
@@ -101,14 +101,14 @@ private class MultiSetOnMap[+T](elems: T*) extends MultiSet[T] {
   }
 
   override def equals(other: Any): Boolean = other match {
-    case that: MultiSetOnMap[Any] => that.isSubsetOf(this) && this.isSubsetOf(that)
+    case that: MultiSetImpl[Any] => that.isSubsetOf(this) && this.isSubsetOf(that)
     case _ => false
   }
 }
 
 object MultiSet {
   def apply[T](elems: T*): MultiSet[T] = if (elems.isEmpty) EmptyMultiSet
-                                         else new MultiSetOnMap[T](elems: _*)
+                                         else new MultiSetImpl[T](elems: _*)
 
   // unapplySeq
 
@@ -119,7 +119,7 @@ object MultiSet {
   private object EmptyMultiSet extends MultiSet {
     override val size: Int = 0
 
-    override def add[A](elems: A*): MultiSet[A] = new MultiSetOnMap[A](elems: _*)
+    override def add[A](elems: A*): MultiSet[A] = new MultiSetImpl[A](elems: _*)
 
     override def find[A](elem: A): Option[A] = None
 
