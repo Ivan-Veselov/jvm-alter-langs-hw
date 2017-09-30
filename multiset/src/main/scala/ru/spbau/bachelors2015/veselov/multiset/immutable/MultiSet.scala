@@ -61,16 +61,9 @@ private class MultiSetOnMap[+T](elems: T*) extends MultiSet[T] {
 
   override def add[A >: T](elems: A*): MultiSet[A] = new MultiSetOnMap[A](asList() ++ elems:_*)
 
-  override def find[A >: T](elem: A): Option[A] = {
-    hashTable.get(elem.hashCode()).flatMap(l => {
-      val index = l.indexWhere { case (t, _) => elem.equals(t) }
-      if (index == -1) {
-        None
-      } else {
-        Option(l(index)._1)
-      }
-    })
-  }
+  override def find[A >: T](elem: A): Option[A] =
+    hashTable.get(elem.hashCode()).flatMap(l => l.find { case (t, _) => elem.equals(t) }.map(_._1))
+
   override def count[A >: T](elem: A): Int = ???
 
   override def intersection[A >: T](other: MultiSet[A]): MultiSet[A] = ???
@@ -93,10 +86,8 @@ private class MultiSetOnMap[+T](elems: T*) extends MultiSet[T] {
       } else {
         ts.map {
         case (t, amount) =>
-          val index = tts.indexWhere { case (tt, _) => t.equals(tt) }
-          if (index == -1) return false
-
-          return amount <= tts(index)._2
+          tts.find { case (tt, _) => t.equals(tt) }
+             .exists { case (_, ttamount) => amount <= ttamount }
         }
       }
     }.fold(false)((a: Boolean, b: Boolean) => a || b)
