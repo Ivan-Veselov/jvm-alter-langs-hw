@@ -88,16 +88,13 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
 
   private def isSubsetOf[A >: T](that: MultiSetImpl[A]): Boolean = {
     hashTable.flatMap { case (hash, ts) =>
-      val tts = that.hashTable.get(hash).orNull
-      if (tts == null) {
-        Seq(false)
-      } else {
+      that.hashTable.get(hash).map { tts =>
         ts.map {
-        case (t, amount) =>
-          tts.find { case (tt, _) => t.equals(tt) }
-             .exists { case (_, ttamount) => amount <= ttamount }
+          case (t, amount) =>
+            tts.find { case (tt, _) => t.equals(tt) }
+               .exists { case (_, ttamount) => amount <= ttamount }
         }
-      }
+      }.getOrElse(Seq(false))
     }.fold(false)((a: Boolean, b: Boolean) => a || b)
   }
 
