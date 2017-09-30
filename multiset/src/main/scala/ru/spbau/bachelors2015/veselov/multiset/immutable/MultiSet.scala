@@ -80,7 +80,8 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
   override def map[A >: T, B](mapper: (A) => B): MultiSet[B] =
     MultiSet(asList().map(mapper): _*)
 
-  override def flatMap[A >: T, B](mapper: (A) => GenTraversableOnce[B]): MultiSet[B] = ???
+  override def flatMap[A >: T, B](mapper: (A) => GenTraversableOnce[B]): MultiSet[B] =
+    MultiSet(asList().flatMap(mapper): _*)
 
   private def asList(): List[T] =
     hashTable.values.flatMap(l => l.flatMap { case (t, a) => List.fill(a)(t) }).toList
