@@ -64,7 +64,11 @@ private class MultiSetOnMap[+T](elems: T*) extends MultiSet[T] {
   override def find[A >: T](elem: A): Option[A] =
     hashTable.get(elem.hashCode()).flatMap(l => l.find { case (t, _) => elem.equals(t) }.map(_._1))
 
-  override def count[A >: T](elem: A): Int = ???
+  override def count[A >: T](elem: A): Int =
+    hashTable.get(elem.hashCode())
+             .flatMap(l => l.find { case (t, _) => elem.equals(t)})
+             .map { case (_, amount) => amount }
+             .getOrElse(0)
 
   override def intersection[A >: T](other: MultiSet[A]): MultiSet[A] = ???
 
