@@ -112,9 +112,9 @@ object MultiSet {
   def apply[T](elems: T*): MultiSet[T] = if (elems.isEmpty) EmptyMultiSet
                                          else new MultiSetImpl[T](elems: _*)
 
-  // unapplySeq
+  def unapplySeq[T](set: MultiSet[T]): Option[Seq[T]] = Some(set.asSeq())
 
-  // (*) = unapplySeq
+  def *[T](set: MultiSet[T]): Option[Seq[T]] = unapplySeq(set)
 
   def empty[T]: MultiSet[T] = EmptyMultiSet
 

@@ -3,7 +3,6 @@ package ru.spbau.bachelors2015.veselov.multiset.immutable
 import org.scalatest.{FlatSpec, Matchers}
 import ru.spbau.bachelors2015.veselov.multiset.immutable
 
-// TODO: pattern-matching
 class MultiSetTest extends FlatSpec with Matchers {
   behavior of "A Multiset"
 
@@ -223,5 +222,15 @@ class MultiSetTest extends FlatSpec with Matchers {
     (for (i: Int <- immutable.MultiSet(0, 0, 1, 1) if i > 0) yield {
       i
     }) shouldBe immutable.MultiSet(1, 1)
+  }
+
+  "Multiset" should "partly support pattern-matching" in {
+    (MultiSet(1, 1, 1) match {
+      case MultiSet() => false
+      case MultiSet(1) => false
+      case MultiSet(1, 1) => false
+      case MultiSet(1, 1, 1) => true
+      case _ => false
+    }) shouldBe true
   }
 }
