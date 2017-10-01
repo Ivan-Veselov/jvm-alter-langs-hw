@@ -3,7 +3,6 @@ package ru.spbau.bachelors2015.veselov.multiset.immutable
 import org.scalatest.{FlatSpec, Matchers}
 import ru.spbau.bachelors2015.veselov.multiset.immutable
 
-// TODO: for-comprehension
 // TODO: pattern-matching
 class MultiSetTest extends FlatSpec with Matchers {
   behavior of "A Multiset"
@@ -210,5 +209,19 @@ class MultiSetTest extends FlatSpec with Matchers {
 
   "Multiset intersection operator syntax" should "work" in {
     immutable.MultiSet(0, 1) & immutable.MultiSet(0, 1, 1) shouldBe immutable.MultiSet(0, 1)
+  }
+
+  "Multiset" should "partly support for-comprehension syntax" in {
+    (for (i: Int <- immutable.MultiSet(0, 0, 1, 1)) yield {
+      i
+    }) shouldBe immutable.MultiSet(0, 0, 1, 1)
+
+    (for (i: Int <- immutable.MultiSet(0, 0, 1, 1)) yield {
+      i * 2
+    }) shouldBe immutable.MultiSet(0, 0, 2, 2)
+
+    (for (i: Int <- immutable.MultiSet(0, 0, 1, 1) if i > 0) yield {
+      i
+    }) shouldBe immutable.MultiSet(1, 1)
   }
 }

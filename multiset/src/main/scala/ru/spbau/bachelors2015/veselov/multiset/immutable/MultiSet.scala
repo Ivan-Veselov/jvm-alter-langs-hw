@@ -1,7 +1,6 @@
 package ru.spbau.bachelors2015.veselov.multiset.immutable
 
-import scala.collection.GenTraversableOnce
-import scala.collection.immutable
+import scala.collection.{GenTraversableOnce, immutable}
 
 sealed abstract class MultiSet[+T] {
   val size: Int
@@ -18,6 +17,8 @@ sealed abstract class MultiSet[+T] {
 
   def apply[A >: T](elem: A): Int = count(elem)
 
+  def foreach[U](f: T => U): Unit = asSeq().foreach(f)
+
   def intersection[A >: T](other: MultiSet[A]): MultiSet[A]
 
   def &[A >: T](other: MultiSet[A]): MultiSet[A] = intersection(other)
@@ -26,11 +27,15 @@ sealed abstract class MultiSet[+T] {
 
   def |[A >: T](other: MultiSet[A]): MultiSet[A] = union(other)
 
-  def filter[A >: T](predicate: A => Boolean): MultiSet[A]
+  def filter[A >: T](predicate: A => Boolean): MultiSet[A] =
+                                                          MultiSet(asSeq().filter(predicate): _*)
 
-  def map[A >: T, B](mapper: A => B): MultiSet[B]
+  def withFilter[A >: T](predicate: A => Boolean): MultiSet[A] = filter(predicate)
 
-  def flatMap[A >: T, B](mapper: A => GenTraversableOnce[B]): MultiSet[B]
+  def map[A >: T, B](mapper: A => B): MultiSet[B] = MultiSet(asSeq().map(mapper): _*)
+
+  def flatMap[A >: T, B](mapper: A => GenTraversableOnce[B]): MultiSet[B] =
+    MultiSet(asSeq().flatMap(mapper): _*)
 
   def asSeq(): Seq[T]
 }
@@ -82,15 +87,6 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
       case (t, amount) => List.fill(math.max(amount, other(t)) - amount)(t)
     } }.toList ++ other.asSeq(): _*)
 
-  override def filter[A >: T](predicate: (A) => Boolean): MultiSet[A] =
-    MultiSet(asSeq().filter(predicate): _*)
-
-  override def map[A >: T, B](mapper: (A) => B): MultiSet[B] =
-    MultiSet(asSeq().map(mapper): _*)
-
-  override def flatMap[A >: T, B](mapper: (A) => GenTraversableOnce[B]): MultiSet[B] =
-    MultiSet(asSeq().flatMap(mapper): _*)
-
   override def asSeq(): Seq[T] =
     hashTable.values.flatMap(l => l.flatMap { case (t, a) => List.fill(a)(t) }).toList
 
@@ -134,12 +130,6 @@ object MultiSet {
     override def intersection[A](other: MultiSet[A]): MultiSet[A] = this
 
     override def union[A](other: MultiSet[A]): MultiSet[A] = other
-
-    override def filter[A](predicate: (A) => Boolean): MultiSet[A] = this
-
-    override def map[A, B](mapper: (A) => B): MultiSet[B] = this
-
-    override def flatMap[A, B](mapper: (A) => GenTraversableOnce[B]): MultiSet[B] = this
 
     override def asSeq(): Seq[Nothing] = Seq.empty
   }
