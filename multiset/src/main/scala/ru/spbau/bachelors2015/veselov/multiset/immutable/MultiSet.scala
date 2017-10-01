@@ -31,6 +31,8 @@ sealed abstract class MultiSet[+T] {
   def map[A >: T, B](mapper: A => B): MultiSet[B]
 
   def flatMap[A >: T, B](mapper: A => GenTraversableOnce[B]): MultiSet[B]
+
+  def asSeq(): Seq[T]
 }
 
 private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
@@ -59,7 +61,7 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
 
   override val size: Int = elems.size
 
-  override def add[A >: T](elems: A*): MultiSet[A] = MultiSet(asList() ++ elems:_*)
+  override def add[A >: T](elems: A*): MultiSet[A] = MultiSet(asSeq() ++ elems:_*)
 
   override def find[A >: T](elem: A): Option[A] =
     hashTable.get(elem.hashCode()).flatMap(l => l.find { case (t, _) => elem.equals(t) }.map(_._1))
@@ -72,18 +74,21 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
 
   override def intersection[A >: T](other: MultiSet[A]): MultiSet[A] = ???
 
-  override def union[A >: T](other: MultiSet[A]): MultiSet[A] = ???
+  override def union[A >: T](other: MultiSet[A]): MultiSet[A] =
+    MultiSet(hashTable.flatMap { case (_, l) => l.flatMap {
+      case (t, amount) => List.fill(math.max(amount, other(t)) - amount)(t)
+    } }.toList ++ other.asSeq(): _*)
 
   override def filter[A >: T](predicate: (A) => Boolean): MultiSet[A] =
-    MultiSet(asList().filter(predicate): _*)
+    MultiSet(asSeq().filter(predicate): _*)
 
   override def map[A >: T, B](mapper: (A) => B): MultiSet[B] =
-    MultiSet(asList().map(mapper): _*)
+    MultiSet(asSeq().map(mapper): _*)
 
   override def flatMap[A >: T, B](mapper: (A) => GenTraversableOnce[B]): MultiSet[B] =
-    MultiSet(asList().flatMap(mapper): _*)
+    MultiSet(asSeq().flatMap(mapper): _*)
 
-  private def asList(): List[T] =
+  override def asSeq(): Seq[T] =
     hashTable.values.flatMap(l => l.flatMap { case (t, a) => List.fill(a)(t) }).toList
 
   private def isSubsetOf[A >: T](that: MultiSetImpl[A]): Boolean = {
@@ -114,7 +119,7 @@ object MultiSet {
 
   def empty[T]: MultiSet[T] = EmptyMultiSet
 
-  private object EmptyMultiSet extends MultiSet {
+  private object EmptyMultiSet extends MultiSet[Nothing] {
     override val size: Int = 0
 
     override def add[A](elems: A*): MultiSet[A] = new MultiSetImpl[A](elems: _*)
@@ -132,5 +137,7 @@ object MultiSet {
     override def map[A, B](mapper: (A) => B): MultiSet[B] = this
 
     override def flatMap[A, B](mapper: (A) => GenTraversableOnce[B]): MultiSet[B] = this
+
+    override def asSeq(): Seq[Nothing] = Seq.empty
   }
 }
