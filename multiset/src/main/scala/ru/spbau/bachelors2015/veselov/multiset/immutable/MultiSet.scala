@@ -72,7 +72,10 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
              .map { case (_, amount) => amount }
              .getOrElse(0)
 
-  override def intersection[A >: T](other: MultiSet[A]): MultiSet[A] = ???
+  override def intersection[A >: T](other: MultiSet[A]): MultiSet[A] =
+    MultiSet(hashTable.flatMap { case (_, l) => l.flatMap {
+      case (t, amount) => List.fill(math.min(amount, other(t)))(t)
+    } }.toList: _*)
 
   override def union[A >: T](other: MultiSet[A]): MultiSet[A] =
     MultiSet(hashTable.flatMap { case (_, l) => l.flatMap {
