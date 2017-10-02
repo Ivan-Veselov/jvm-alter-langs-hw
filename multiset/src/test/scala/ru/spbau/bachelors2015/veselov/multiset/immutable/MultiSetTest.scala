@@ -180,34 +180,23 @@ class MultiSetTest extends FlatSpec with Matchers {
   // intersection and union
 
   "Multiset union" should "work" in {
-    immutable.MultiSet(0, 1).union(immutable.MultiSet(0, 1)) shouldBe immutable.MultiSet(0, 1)
+    immutable.MultiSet(0, 1) | immutable.MultiSet(0, 1) shouldBe immutable.MultiSet(0, 1)
 
-    immutable.MultiSet(0, 1).union(immutable.MultiSet(0, 2)) shouldBe immutable.MultiSet(0, 1, 2)
+    immutable.MultiSet(0, 1) | immutable.MultiSet(0, 2) shouldBe immutable.MultiSet(0, 1, 2)
 
-    immutable.MultiSet(0, 1).union(immutable.MultiSet(0, 1, 1)) shouldBe immutable.MultiSet(0, 1, 1)
-
-    immutable.MultiSet(0, 1).union(immutable.MultiSet(2, 3)) shouldBe immutable.MultiSet(0, 1, 2, 3)
-  }
-
-  "Multiset union operator syntax" should "work" in {
     immutable.MultiSet(0, 1) | immutable.MultiSet(0, 1, 1) shouldBe immutable.MultiSet(0, 1, 1)
+
+    immutable.MultiSet(0, 1) | immutable.MultiSet(2, 3) shouldBe immutable.MultiSet(0, 1, 2, 3)
   }
 
   "Multiset intersection" should "work" in {
-    immutable.MultiSet(0, 1).intersection(immutable.MultiSet(0, 1)) shouldBe
-                                                                            immutable.MultiSet(0, 1)
+    immutable.MultiSet(0, 1) & immutable.MultiSet(0, 1) shouldBe immutable.MultiSet(0, 1)
 
-    immutable.MultiSet(0, 1).intersection(immutable.MultiSet(0, 2)) shouldBe immutable.MultiSet(0)
+    immutable.MultiSet(0, 1) & immutable.MultiSet(0, 2) shouldBe immutable.MultiSet(0)
 
-    immutable.MultiSet(0, 1).intersection(immutable.MultiSet(0, 1, 1)) shouldBe
-                                                                            immutable.MultiSet(0, 1)
-
-    immutable.MultiSet(0, 1).intersection(immutable.MultiSet(2, 3)) shouldBe
-                                                                          immutable.MultiSet.empty
-  }
-
-  "Multiset intersection operator syntax" should "work" in {
     immutable.MultiSet(0, 1) & immutable.MultiSet(0, 1, 1) shouldBe immutable.MultiSet(0, 1)
+
+    immutable.MultiSet(0, 1) & immutable.MultiSet(2, 3) shouldBe immutable.MultiSet.empty
   }
 
   "Multiset" should "partly support for-comprehension syntax" in {

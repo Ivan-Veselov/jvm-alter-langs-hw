@@ -19,13 +19,9 @@ sealed abstract class MultiSet[+T] {
 
   def foreach[U](f: T => U): Unit = asSeq().foreach(f)
 
-  def intersection[A >: T](other: MultiSet[A]): MultiSet[A]
+  def &[A >: T](other: MultiSet[A]): MultiSet[A]
 
-  def &[A >: T](other: MultiSet[A]): MultiSet[A] = intersection(other)
-
-  def union[A >: T](other: MultiSet[A]): MultiSet[A]
-
-  def |[A >: T](other: MultiSet[A]): MultiSet[A] = union(other)
+  def |[A >: T](other: MultiSet[A]): MultiSet[A]
 
   def filter[A >: T](predicate: A => Boolean): MultiSet[A] =
                                                           MultiSet(asSeq().filter(predicate): _*)
@@ -77,12 +73,12 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
              .map { case (_, amount) => amount }
              .getOrElse(0)
 
-  override def intersection[A >: T](other: MultiSet[A]): MultiSet[A] =
+  override def &[A >: T](other: MultiSet[A]): MultiSet[A] =
     MultiSet(hashTable.flatMap { case (_, l) => l.flatMap {
       case (t, amount) => List.fill(math.min(amount, other(t)))(t)
     } }.toList: _*)
 
-  override def union[A >: T](other: MultiSet[A]): MultiSet[A] =
+  override def |[A >: T](other: MultiSet[A]): MultiSet[A] =
     MultiSet(hashTable.flatMap { case (_, l) => l.flatMap {
       case (t, amount) => List.fill(math.max(amount, other(t)) - amount)(t)
     } }.toList ++ other.asSeq(): _*)
@@ -127,9 +123,9 @@ object MultiSet {
 
     override def count[A](elem: A): Int = 0
 
-    override def intersection[A](other: MultiSet[A]): MultiSet[A] = this
+    override def &[A](other: MultiSet[A]): MultiSet[A] = this
 
-    override def union[A](other: MultiSet[A]): MultiSet[A] = other
+    override def |[A](other: MultiSet[A]): MultiSet[A] = other
 
     override def asSeq(): Seq[Nothing] = Seq.empty
   }
