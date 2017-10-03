@@ -40,70 +40,6 @@ sealed abstract class MultiSet[+T] {
   def asSeq(): Seq[T]
 }
 
-private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] { // TODO
-  private val hashTable: Map[Int, List[(T, Int)]] = // TODO
-    elems.toList
-         .groupBy(e => e.hashCode())
-         .map { case (k, v) =>
-           (k, v.map(t => (t, v.count(t == _)))
-                .distinct)
-         }
-
-  override val size: Int = elems.size
-
-  override def +[A >: T](elem: A): MultiSet[A] = MultiSet(elem +: asSeq():_*)
-
-  override def find[A >: T](elem: A): Option[A] =
-    for (list <- hashTable.get(elem.hashCode());
-         (t, _) <- list.find(elem == _._1)) yield t
-
-  override def count[A >: T](elem: A): Int =
-    (for (list <- hashTable.get(elem.hashCode());
-         (_, amount) <- list.find(elem == _._1)) yield amount).getOrElse(0)
-
-  override def &[A >: T](other: MultiSet[A]): MultiSet[A] = // TODO
-    MultiSet(
-      hashTable.flatMap { case (_, l) =>
-        l.flatMap { case (t, amount) =>
-          List.fill(math.min(amount, other(t)))(t)
-        }
-      }.toList: _*
-    )
-
-  override def |[A >: T](other: MultiSet[A]): MultiSet[A] = // TODO
-    MultiSet(
-      hashTable.flatMap { case (_, l) =>
-        l.flatMap { case (t, amount) =>
-          List.fill(math.max(amount, other(t)) - amount)(t)
-        }
-      }.toList ++ other.asSeq(): _*
-    )
-
-  override def asSeq(): Seq[T] = // TODO
-    hashTable.values
-             .flatMap(l =>
-               l.flatMap { case (t, a) =>
-                 List.fill(a)(t)
-               })
-             .toList
-
-  private def isSubsetOf[A >: T](that: MultiSetImpl[A]): Boolean = {
-    val tmp =
-      for ((hash, ts) <- hashTable; tts <- that.hashTable.get(hash)) yield {
-        for ((t, tamount) <- ts; (tt, ttamount) <- tts) yield {
-          t == tt && tamount <= ttamount
-        }
-      }
-
-    tmp.flatten.fold(false)(_ || _) // TODO
-  }
-
-  override def equals(other: Any): Boolean = other match {
-    case that: MultiSetImpl[Any] => that.isSubsetOf(this) && this.isSubsetOf(that)
-    case _ => false
-  }
-}
-
 object MultiSet {
   def apply[T](elems: T*): MultiSet[T] = if (elems.isEmpty) EmptyMultiSet
                                          else new MultiSetImpl[T](elems: _*)
@@ -128,5 +64,69 @@ object MultiSet {
     override def |[A](other: MultiSet[A]): MultiSet[A] = other
 
     override def asSeq(): Seq[Nothing] = Seq.empty
+  }
+
+  private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
+    private val hashTable: Map[Int, List[(T, Int)]] = // TODO
+      elems.toList
+        .groupBy(e => e.hashCode())
+        .map { case (k, v) =>
+          (k, v.map(t => (t, v.count(t == _)))
+            .distinct)
+        }
+
+    override val size: Int = elems.size
+
+    override def +[A >: T](elem: A): MultiSet[A] = MultiSet(elem +: asSeq():_*)
+
+    override def find[A >: T](elem: A): Option[A] =
+      for (list <- hashTable.get(elem.hashCode());
+           (t, _) <- list.find(elem == _._1)) yield t
+
+    override def count[A >: T](elem: A): Int =
+      (for (list <- hashTable.get(elem.hashCode());
+            (_, amount) <- list.find(elem == _._1)) yield amount).getOrElse(0)
+
+    override def &[A >: T](other: MultiSet[A]): MultiSet[A] = // TODO
+      MultiSet(
+        hashTable.flatMap { case (_, l) =>
+          l.flatMap { case (t, amount) =>
+            List.fill(math.min(amount, other(t)))(t)
+          }
+        }.toList: _*
+      )
+
+    override def |[A >: T](other: MultiSet[A]): MultiSet[A] = // TODO
+      MultiSet(
+        hashTable.flatMap { case (_, l) =>
+          l.flatMap { case (t, amount) =>
+            List.fill(math.max(amount, other(t)) - amount)(t)
+          }
+        }.toList ++ other.asSeq(): _*
+      )
+
+    override def asSeq(): Seq[T] = // TODO
+      hashTable.values
+        .flatMap(l =>
+          l.flatMap { case (t, a) =>
+            List.fill(a)(t)
+          })
+        .toList
+
+    private def isSubsetOf[A >: T](that: MultiSetImpl[A]): Boolean = {
+      val tmp =
+        for ((hash, ts) <- hashTable; tts <- that.hashTable.get(hash)) yield {
+          for ((t, tamount) <- ts; (tt, ttamount) <- tts) yield {
+            t == tt && tamount <= ttamount
+          }
+        }
+
+      tmp.flatten.fold(false)(_ || _) // TODO
+    }
+
+    override def equals(other: Any): Boolean = other match {
+      case that: MultiSetImpl[Any] => that.isSubsetOf(this) && this.isSubsetOf(that)
+      case _ => false
+    }
   }
 }
