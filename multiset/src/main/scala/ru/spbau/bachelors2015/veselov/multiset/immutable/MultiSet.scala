@@ -48,7 +48,7 @@ object MultiSet {
 
   def *[T](set: MultiSet[T]): Option[Seq[T]] = unapplySeq(set)
 
-  def empty[T]: MultiSet[T] = EmptyMultiSet
+  def empty[T](): MultiSet[T] = EmptyMultiSet
 
   private object EmptyMultiSet extends MultiSet[Nothing] {
     override val size: Int = 0
