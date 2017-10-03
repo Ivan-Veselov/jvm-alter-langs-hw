@@ -25,16 +25,16 @@ class MultiSetTest extends FlatSpec with Matchers {
   }
 
   "Empty Multiset addition" should "work" in {
-    MultiSet.empty.add(0) shouldBe MultiSet(0)
+    MultiSet.empty + 0 shouldBe MultiSet(0)
 
-    MultiSet.empty.add(0, 1) shouldBe MultiSet(0, 1)
+    MultiSet.empty[Int] + 0 + 1 shouldBe MultiSet(0, 1)
 
-    MultiSet.empty.add(0, 0) shouldBe MultiSet(0, 0)
+    MultiSet.empty + 0 + 0 shouldBe MultiSet(0, 0)
   }
 
   "Empty Multiset" should "be immutable" in {
     val emptySet = MultiSet.empty
-    emptySet.add(0) should not be theSameInstanceAs(emptySet)
+    emptySet + 0 should not be theSameInstanceAs(emptySet)
   }
 
   "Empty Multiset find" should "return None" in {
@@ -98,30 +98,30 @@ class MultiSetTest extends FlatSpec with Matchers {
   }
 
   "Non empty Multiset addition" should "work" in {
-    MultiSet(0).add(1) shouldBe MultiSet(0, 1)
+    MultiSet(0) + 1 shouldBe MultiSet(0, 1)
 
-    MultiSet(0).add(1, 2) shouldBe MultiSet(0, 1, 2)
+    MultiSet(0) + 1 + 2 shouldBe MultiSet(0, 1, 2)
 
-    MultiSet(0).add(1, 2) shouldBe MultiSet(1, 0, 2)
+    MultiSet(0) + 1 + 2 shouldBe MultiSet(1, 0, 2)
 
-    MultiSet(0).add(1, 2) shouldBe MultiSet(2, 0, 1)
+    MultiSet(0) + 1 + 2 shouldBe MultiSet(2, 0, 1)
 
-    MultiSet(0).add(0) shouldBe MultiSet(0, 0)
+    MultiSet(0) + 0 shouldBe MultiSet(0, 0)
 
-    MultiSet(0).add(0, 1) shouldBe MultiSet(0, 0, 1)
+    MultiSet(0) + 0 + 1 shouldBe MultiSet(0, 0, 1)
 
-    MultiSet(0).add(0, 0) shouldBe MultiSet(0, 0, 0)
+    MultiSet(0) + 0 + 0 shouldBe MultiSet(0, 0, 0)
 
-    MultiSet(0, 0).add(0) shouldBe MultiSet(0, 0, 0)
+    MultiSet(0, 0) + 0 shouldBe MultiSet(0, 0, 0)
 
-    MultiSet(0, 0).add(1) shouldBe MultiSet(0, 0, 1)
+    MultiSet(0, 0) + 1 shouldBe MultiSet(0, 0, 1)
 
-    MultiSet(0, 0).add(1, 1) shouldBe MultiSet(0, 0, 1, 1)
+    MultiSet(0, 0) + 1 + 1 shouldBe MultiSet(0, 0, 1, 1)
   }
 
   "Non empty Multiset" should "be immutable" in {
     val oneElementSet = MultiSet(0)
-    oneElementSet.add(1) should not be theSameInstanceAs(oneElementSet)
+    oneElementSet + 1 should not be theSameInstanceAs(oneElementSet)
   }
 
   "Non empty Multiset find" should "work" in {

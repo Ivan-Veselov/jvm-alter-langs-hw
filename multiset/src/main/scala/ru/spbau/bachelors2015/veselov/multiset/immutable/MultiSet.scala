@@ -9,7 +9,7 @@ sealed abstract class MultiSet[+T] {
 
   def nonEmpty: Boolean = size > 0
 
-  def add[A >: T](elems: A*): MultiSet[A]
+  def +[A >: T](elem: A): MultiSet[A]
 
   def find[A >: T](elem: A): Option[A]
 
@@ -23,13 +23,17 @@ sealed abstract class MultiSet[+T] {
 
   def |[A >: T](other: MultiSet[A]): MultiSet[A]
 
+  // TODO
   def filter[A >: T](predicate: A => Boolean): MultiSet[A] =
                                                           MultiSet(asSeq().filter(predicate): _*)
 
+  // TODO
   def withFilter[A >: T](predicate: A => Boolean): MultiSet[A] = filter(predicate)
 
+  // TODO
   def map[A >: T, B](mapper: A => B): MultiSet[B] = MultiSet(asSeq().map(mapper): _*)
 
+  // TODO
   def flatMap[A >: T, B](mapper: A => GenTraversableOnce[B]): MultiSet[B] =
     MultiSet(asSeq().flatMap(mapper): _*)
 
@@ -47,7 +51,7 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] { // TODO
 
   override val size: Int = elems.size
 
-  override def add[A >: T](elems: A*): MultiSet[A] = MultiSet(asSeq() ++ elems:_*) // TODO
+  override def +[A >: T](elem: A): MultiSet[A] = MultiSet(elem +: asSeq():_*)
 
   override def find[A >: T](elem: A): Option[A] =
     for (list <- hashTable.get(elem.hashCode());
@@ -113,7 +117,7 @@ object MultiSet {
   private object EmptyMultiSet extends MultiSet[Nothing] {
     override val size: Int = 0
 
-    override def add[A](elems: A*): MultiSet[A] = new MultiSetImpl[A](elems: _*)
+    override def +[A](elem: A): MultiSet[A] = new MultiSetImpl[A](Seq(elem): _*)
 
     override def find[A](elem: A): Option[A] = None
 
