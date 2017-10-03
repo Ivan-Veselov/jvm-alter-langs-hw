@@ -23,17 +23,13 @@ sealed abstract class MultiSet[+T] {
 
   def |[A >: T](other: MultiSet[A]): MultiSet[A]
 
-  // TODO
   def filter[A >: T](predicate: A => Boolean): MultiSet[A] =
-                                                          MultiSet(asSeq().filter(predicate): _*)
+    MultiSet(asSeq().filter(predicate): _*)
 
-  // TODO
   def withFilter[A >: T](predicate: A => Boolean): MultiSet[A] = filter(predicate)
 
-  // TODO
   def map[A >: T, B](mapper: A => B): MultiSet[B] = MultiSet(asSeq().map(mapper): _*)
 
-  // TODO
   def flatMap[A >: T, B](mapper: A => GenTraversableOnce[B]): MultiSet[B] =
     MultiSet(asSeq().flatMap(mapper): _*)
 
@@ -101,20 +97,17 @@ object MultiSet {
         ).flatten.toList ++ other.asSeq(): _*
       )
 
-    override def asSeq(): Seq[T] = // TODO
-      hashTable.values
-        .flatMap(l =>
-          l.flatMap { case (t, a) =>
-            List.fill(a)(t)
-          })
-        .toList
+    override def asSeq(): Seq[T] =
+      (for (list <- hashTable.values; (t, a) <- list) yield {
+        List.fill(a)(t)
+      }).flatten.toList
 
     private def isSubsetOf[A >: T](that: MultiSetImpl[A]): Boolean =
       (for ((hash, ts) <- hashTable; tts <- that.hashTable.get(hash)) yield {
         for ((t, tamount) <- ts; (tt, ttamount) <- tts) yield {
           t == tt && tamount <= ttamount
         }
-      }).flatten.fold(false)(_ || _) // TODO
+      }).flatten.fold(false)(_ || _)
 
     override def equals(other: Any): Boolean = other match {
       case that: MultiSetImpl[Any] => that.isSubsetOf(this) && this.isSubsetOf(that)
