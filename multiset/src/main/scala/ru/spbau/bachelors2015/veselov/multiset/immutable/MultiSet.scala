@@ -53,15 +53,9 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] { // TODO
     for (list <- hashTable.get(elem.hashCode());
          (t, _) <- list.find(elem == _._1)) yield t
 
-  override def count[A >: T](elem: A): Int = // TODO
-    hashTable.get(elem.hashCode())
-             .flatMap(l => l.find { case (t, _) =>
-               elem == t
-             })
-             .map { case (_, amount) =>
-               amount
-             }
-             .getOrElse(0)
+  override def count[A >: T](elem: A): Int =
+    (for (list <- hashTable.get(elem.hashCode());
+         (_, amount) <- list.find(elem == _._1)) yield amount).getOrElse(0)
 
   override def &[A >: T](other: MultiSet[A]): MultiSet[A] = // TODO
     MultiSet(
