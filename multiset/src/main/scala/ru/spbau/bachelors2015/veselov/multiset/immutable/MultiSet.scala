@@ -37,7 +37,7 @@ sealed abstract class MultiSet[+T] {
 }
 
 private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
-  private val hashTable: immutable.Map[Int, List[(T, Int)]] =
+  private val hashTable: Map[Int, List[(T, Int)]] =
     elems.toList
          .groupBy(e => e.hashCode())
          .map { case (k, v) =>
