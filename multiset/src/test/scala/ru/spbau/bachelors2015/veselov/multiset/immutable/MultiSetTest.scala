@@ -1,7 +1,6 @@
 package ru.spbau.bachelors2015.veselov.multiset.immutable
 
 import org.scalatest.{FlatSpec, Matchers}
-import ru.spbau.bachelors2015.veselov.multiset.immutable
 
 class MultiSetTest extends FlatSpec with Matchers {
   behavior of "A Multiset"
@@ -13,52 +12,52 @@ class MultiSetTest extends FlatSpec with Matchers {
   }
 
   "Empty Multiset size" should "be 0" in {
-    MultiSet.empty.size shouldBe 0
+    MultiSet.empty().size shouldBe 0
   }
 
   "Empty Multiset" should "be empty" in {
-    MultiSet.empty.isEmpty shouldBe true
+    MultiSet.empty().isEmpty shouldBe true
   }
 
   "Empty Multiset" should "not be non empty" in {
-    MultiSet.empty.nonEmpty shouldBe false
+    MultiSet.empty().nonEmpty shouldBe false
   }
 
   "Empty Multiset addition" should "work" in {
-    MultiSet.empty + 0 shouldBe MultiSet(Seq(0))
+    MultiSet.empty() + 0 shouldBe MultiSet(Seq(0))
 
-    MultiSet.empty[Int] + 0 + 1 shouldBe MultiSet(Seq(0, 1))
+    MultiSet.empty[Int]() + 0 + 1 shouldBe MultiSet(Seq(0, 1))
 
-    MultiSet.empty + 0 + 0 shouldBe MultiSet(Seq(0, 0))
+    MultiSet.empty() + 0 + 0 shouldBe MultiSet(Seq(0, 0))
   }
 
   "Empty Multiset" should "be immutable" in {
-    val emptySet = MultiSet.empty
+    val emptySet = MultiSet.empty()
     emptySet + 0 should not be theSameInstanceAs(emptySet)
   }
 
   "Empty Multiset find" should "return None" in {
-    MultiSet.empty.find(0) shouldBe None
+    MultiSet.empty().find(0) shouldBe None
   }
 
   "Empty Multiset count" should "be 0" in {
-    MultiSet.empty.count(0) shouldBe 0
+    MultiSet.empty().count(0) shouldBe 0
   }
 
   "Empty Multiset apply syntax" should "work" in {
-    MultiSet.empty(0) shouldBe 0
+    MultiSet.empty()(0) shouldBe 0
   }
 
   "Empty Multiset filter" should "return empty Multiset" in {
-    MultiSet.empty[Any].filter(_ => true) shouldBe MultiSet.empty
+    MultiSet.empty[Any]().filter(_ => true) shouldBe MultiSet.empty
   }
 
   "Empty Multiset map" should "return empty Multiset" in {
-    MultiSet.empty[Any].map((_: Any) => 0) shouldBe MultiSet.empty
+    MultiSet.empty[Any]().map((_: Any) => 0) shouldBe MultiSet.empty
   }
 
   "Empty Multiset flatMap" should "return empty Multiset" in {
-    MultiSet.empty[Any].flatMap((_: Any) => List(0)) shouldBe MultiSet.empty
+    MultiSet.empty[Any]().flatMap((_: Any) => List(0)) shouldBe MultiSet.empty
   }
 
   // Multiset of ints
