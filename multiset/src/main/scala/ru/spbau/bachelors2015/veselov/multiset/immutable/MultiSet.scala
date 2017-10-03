@@ -17,7 +17,7 @@ sealed abstract class MultiSet[+T] {
 
   def apply[A >: T](elem: A): Int = count(elem)
 
-  def foreach[U](f: T => U): Unit = asSeq().foreach(f)
+  def foreach[U](f: T => U): Unit
 
   def &[A >: T](other: MultiSet[A]): MultiSet[A]
 
@@ -54,6 +54,8 @@ object MultiSet {
 
     override def count[A](elem: A): Int = 0
 
+    override def foreach[U](f: Nothing => U): Unit = Unit
+
     override def &[A](other: MultiSet[A]): MultiSet[A] = this
 
     override def |[A](other: MultiSet[A]): MultiSet[A] = other
@@ -87,6 +89,11 @@ object MultiSet {
     override def count[A >: T](elem: A): Int =
       (for (list <- hashTable.get(elem.hashCode());
             (_, amount) <- list.find(elem == _._1)) yield amount).getOrElse(0)
+
+    override def foreach[U](f: T => U): Unit =
+      for (list <- hashTable.values; (t, a) <- list) {
+        1 to a foreach(_ => f(t))
+      }
 
     override def &[A >: T](other: MultiSet[A]): MultiSet[A] =
       MultiSet(
