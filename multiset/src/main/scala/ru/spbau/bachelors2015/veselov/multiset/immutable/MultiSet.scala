@@ -36,8 +36,8 @@ sealed abstract class MultiSet[+T] {
   def asSeq(): Seq[T]
 }
 
-private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
-  private val hashTable: Map[Int, List[(T, Int)]] =
+private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] { // TODO
+  private val hashTable: Map[Int, List[(T, Int)]] = // TODO
     elems.toList
          .groupBy(e => e.hashCode())
          .map { case (k, v) =>
@@ -47,17 +47,13 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
 
   override val size: Int = elems.size
 
-  override def add[A >: T](elems: A*): MultiSet[A] = MultiSet(asSeq() ++ elems:_*)
+  override def add[A >: T](elems: A*): MultiSet[A] = MultiSet(asSeq() ++ elems:_*) // TODO
 
   override def find[A >: T](elem: A): Option[A] =
-    hashTable.get(elem.hashCode())
-             .flatMap(l =>
-               l.find { case (t, _) =>
-                 elem == t
-               }
-                .map(_._1))
+    for (list <- hashTable.get(elem.hashCode());
+         (t, _) <- list.find(elem == _._1)) yield t
 
-  override def count[A >: T](elem: A): Int =
+  override def count[A >: T](elem: A): Int = // TODO
     hashTable.get(elem.hashCode())
              .flatMap(l => l.find { case (t, _) =>
                elem == t
@@ -67,7 +63,7 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
              }
              .getOrElse(0)
 
-  override def &[A >: T](other: MultiSet[A]): MultiSet[A] =
+  override def &[A >: T](other: MultiSet[A]): MultiSet[A] = // TODO
     MultiSet(
       hashTable.flatMap { case (_, l) =>
         l.flatMap { case (t, amount) =>
@@ -76,7 +72,7 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
       }.toList: _*
     )
 
-  override def |[A >: T](other: MultiSet[A]): MultiSet[A] =
+  override def |[A >: T](other: MultiSet[A]): MultiSet[A] = // TODO
     MultiSet(
       hashTable.flatMap { case (_, l) =>
         l.flatMap { case (t, amount) =>
@@ -85,7 +81,7 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
       }.toList ++ other.asSeq(): _*
     )
 
-  override def asSeq(): Seq[T] =
+  override def asSeq(): Seq[T] = // TODO
     hashTable.values
              .flatMap(l =>
                l.flatMap { case (t, a) =>
@@ -101,7 +97,7 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
         }
       }
 
-    tmp.flatten.fold(false)(_ || _)
+    tmp.flatten.fold(false)(_ || _) // TODO
   }
 
   override def equals(other: Any): Boolean = other match {
