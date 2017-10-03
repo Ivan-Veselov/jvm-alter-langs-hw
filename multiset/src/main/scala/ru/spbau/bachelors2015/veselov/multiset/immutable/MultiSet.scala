@@ -1,6 +1,6 @@
 package ru.spbau.bachelors2015.veselov.multiset.immutable
 
-import scala.collection.{GenTraversableOnce, immutable}
+import scala.collection.{GenTraversableOnce, immutable, mutable}
 
 sealed abstract class MultiSet[+T] {
   val size: Int
@@ -37,28 +37,13 @@ sealed abstract class MultiSet[+T] {
 }
 
 private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
-  private val hashTable: immutable.HashMap[Int, List[(T, Int)]] = {
-    var fromHash: immutable.HashMap[Int, List[T]] = immutable.HashMap.empty
-
-    elems.foreach(e => fromHash = fromHash.updated(e.hashCode(),
-                                                   fromHash.getOrElse(e.hashCode(), Nil) :+ e))
-
-    fromHash.map {
-      case (hash, es) =>
-        var pairs: List[(T, Int)] = Nil
-        es.foreach(t => {
-          val index = pairs.indexWhere { case (mainVal, _) => mainVal.equals(t) }
-          if (index == -1) {
-            pairs = pairs :+ (t, 1)
-          } else {
-            val amount = pairs(index)._2
-            pairs = pairs.updated(index, (t, amount + 1))
-          }
-        })
-
-        (hash, pairs)
-    }
-  }
+  private val hashTable: immutable.Map[Int, List[(T, Int)]] =
+    elems.toList
+         .groupBy(e => e.hashCode())
+         .map { case (k, v) =>
+           (k, v.map(t => (t, v.count(t == _)))
+                .distinct)
+         }
 
   override val size: Int = elems.size
 
