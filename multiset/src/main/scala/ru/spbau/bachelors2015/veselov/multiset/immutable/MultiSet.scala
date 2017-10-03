@@ -1,6 +1,6 @@
 package ru.spbau.bachelors2015.veselov.multiset.immutable
 
-import scala.collection.{GenTraversableOnce, immutable, mutable}
+import scala.collection.GenTraversableOnce
 
 sealed abstract class MultiSet[+T] {
   val size: Int
@@ -50,37 +50,58 @@ private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] {
   override def add[A >: T](elems: A*): MultiSet[A] = MultiSet(asSeq() ++ elems:_*)
 
   override def find[A >: T](elem: A): Option[A] =
-    hashTable.get(elem.hashCode()).flatMap(l => l.find { case (t, _) => elem.equals(t) }.map(_._1))
+    hashTable.get(elem.hashCode())
+             .flatMap(l =>
+               l.find { case (t, _) =>
+                 elem == t
+               }
+                .map(_._1))
 
   override def count[A >: T](elem: A): Int =
     hashTable.get(elem.hashCode())
-             .flatMap(l => l.find { case (t, _) => elem.equals(t)})
-             .map { case (_, amount) => amount }
+             .flatMap(l => l.find { case (t, _) =>
+               elem == t
+             })
+             .map { case (_, amount) =>
+               amount
+             }
              .getOrElse(0)
 
   override def &[A >: T](other: MultiSet[A]): MultiSet[A] =
-    MultiSet(hashTable.flatMap { case (_, l) => l.flatMap {
-      case (t, amount) => List.fill(math.min(amount, other(t)))(t)
-    } }.toList: _*)
+    MultiSet(
+      hashTable.flatMap { case (_, l) =>
+        l.flatMap { case (t, amount) =>
+          List.fill(math.min(amount, other(t)))(t)
+        }
+      }.toList: _*
+    )
 
   override def |[A >: T](other: MultiSet[A]): MultiSet[A] =
-    MultiSet(hashTable.flatMap { case (_, l) => l.flatMap {
-      case (t, amount) => List.fill(math.max(amount, other(t)) - amount)(t)
-    } }.toList ++ other.asSeq(): _*)
+    MultiSet(
+      hashTable.flatMap { case (_, l) =>
+        l.flatMap { case (t, amount) =>
+          List.fill(math.max(amount, other(t)) - amount)(t)
+        }
+      }.toList ++ other.asSeq(): _*
+    )
 
   override def asSeq(): Seq[T] =
-    hashTable.values.flatMap(l => l.flatMap { case (t, a) => List.fill(a)(t) }).toList
+    hashTable.values
+             .flatMap(l =>
+               l.flatMap { case (t, a) =>
+                 List.fill(a)(t)
+               })
+             .toList
 
   private def isSubsetOf[A >: T](that: MultiSetImpl[A]): Boolean = {
-    hashTable.flatMap { case (hash, ts) =>
-      that.hashTable.get(hash).map { tts =>
-        ts.map {
-          case (t, amount) =>
-            tts.find { case (tt, _) => t.equals(tt) }
-               .exists { case (_, ttamount) => amount <= ttamount }
+    val tmp =
+      for ((hash, ts) <- hashTable; tts <- that.hashTable.get(hash)) yield {
+        for ((t, tamount) <- ts; (tt, ttamount) <- tts) yield {
+          t == tt && tamount <= ttamount
         }
-      }.getOrElse(Seq(false))
-    }.fold(false)((a: Boolean, b: Boolean) => a || b)
+      }
+
+    tmp.flatten.fold(false)(_ || _)
   }
 
   override def equals(other: Any): Boolean = other match {
