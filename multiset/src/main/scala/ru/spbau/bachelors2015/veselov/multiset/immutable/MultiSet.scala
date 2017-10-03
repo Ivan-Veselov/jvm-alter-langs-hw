@@ -35,19 +35,20 @@ sealed abstract class MultiSet[+T] {
 }
 
 object MultiSet {
-  def apply[T](elems: T*): MultiSet[T] = if (elems.isEmpty) EmptyMultiSet
-                                         else new MultiSetImpl[T](elems: _*)
+  def apply[T](elems: GenTraversableOnce[T]): MultiSet[T] =
+    if (elems.isEmpty) EmptyMultiSet
+    else new MultiSetImpl[T](elems)
 
   def unapplySeq[T](set: MultiSet[T]): Option[Seq[T]] = Some(set.asSeq())
 
   def *[T](set: MultiSet[T]): Option[Seq[T]] = unapplySeq(set)
 
-  def empty[T](): MultiSet[T] = EmptyMultiSet
+  def empty[T]: MultiSet[T] = EmptyMultiSet
 
   private object EmptyMultiSet extends MultiSet[Nothing] {
     override val size: Int = 0
 
-    override def +[A](elem: A): MultiSet[A] = new MultiSetImpl[A](Seq(elem): _*)
+    override def +[A](elem: A): MultiSet[A] = new MultiSetImpl[A](Seq(elem))
 
     override def find[A](elem: A): Option[A] = None
 
@@ -66,7 +67,7 @@ object MultiSet {
     override def asSeq(): Seq[Nothing] = Seq.empty
   }
 
-  private class MultiSetImpl[+T](elems: T*) extends MultiSet[T] { // TODO
+  private class MultiSetImpl[+T](elems: GenTraversableOnce[T]) extends MultiSet[T] {
     private val hashTable: Map[Int, List[(T, Int)]] =
       elems.toList
            .groupBy(e => e.hashCode())
@@ -77,7 +78,7 @@ object MultiSet {
 
     override val size: Int = elems.size
 
-    override def +[A >: T](elem: A): MultiSet[A] = MultiSet(elem +: asSeq():_*)
+    override def +[A >: T](elem: A): MultiSet[A] = MultiSet(elem +: asSeq())
 
     override def find[A >: T](elem: A): Option[A] =
       for (list <- hashTable.get(elem.hashCode());
@@ -91,21 +92,21 @@ object MultiSet {
       MultiSet(
         (for ((_, list) <- hashTable; (t, amount) <- list) yield
           List.fill(math.min(amount, other(t)))(t)
-        ).flatten.toList: _*
+        ).flatten
       )
 
     override def |[A >: T](other: MultiSet[A]): MultiSet[A] =
       MultiSet(
         (for ((_, list) <- hashTable; (t, amount) <- list) yield
           List.fill(math.max(amount, other(t)) - amount)(t)
-        ).flatten.toList ++ other.asSeq(): _*
+        ).flatten ++ other.asSeq()
       )
 
     override def filter[A >: T](predicate: A => Boolean): MultiSet[A] =
       MultiSet(
         (for (list <- hashTable.values; (t, a) <- list if predicate(t)) yield {
           List.fill(a)(t)
-        }).flatten.toList: _*
+        }).flatten
       )
 
     override def map[A >: T, B](mapper: A => B): MultiSet[B] =
@@ -113,7 +114,7 @@ object MultiSet {
         (for (list <- hashTable.values; (t, a) <- list) yield {
           val mt = mapper(t)
           List.fill(a)(mt)
-        }).flatten.toList: _*
+        }).flatten
       )
 
     override def flatMap[A >: T, B](mapper: A => GenTraversableOnce[B]): MultiSet[B] =
@@ -121,7 +122,7 @@ object MultiSet {
         (for (list <- hashTable.values; (t, a) <- list) yield {
           val mt = mapper(t)
           List.fill(a)(mt)
-        }).flatten.flatten.toList: _*
+        }).flatten.flatten
       )
 
     override def asSeq(): Seq[T] =
